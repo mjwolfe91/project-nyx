@@ -3,7 +3,17 @@ import numpy as np
 import pandas as pd
 import pandasql as ps
 import tmdbsimple as tmdb
+import pymysql
+
 tmdb.API_KEY = '40489ab6ba001d13b45d8b38709f687c'
+
+conn = pymysql.connect(host="172.116.176.142:3306", port=3306, user='root', passwd='projectnyx1234')
+conn.cursor().execute("CREATE DATABASE IF NOT EXISTS tmdb")
+conn = pymysql.connect(host="172.116.176.142:3306",
+                       port=3306,
+                       user='root',
+                       passwd='projectnyx1234',
+                       db='tmdb')
 
 def generate_cast_financials(volume)->pd.DataFrame:
     '''
@@ -53,4 +63,8 @@ tbl_cast_financials = """SELECT cast_member, avg(gross_margin_pct) as cast_gross
                          order by cast_gross_margin_pct desc, cast_gross_margin desc, cast_count desc
                       """
 final_table_cast = ps.sqldf(tbl_cast_financials, locals())
-final_table_cast
+final_table_cast.to_sql(name='cast',
+                        con=conn,
+                        if_exists='replace',
+                        index=False,
+                        flavor='mysql')

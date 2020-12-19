@@ -3,7 +3,18 @@ import numpy as np
 import pandas as pd
 import pandasql as ps
 import tmdbsimple as tmdb
+import pymysql
+
 tmdb.API_KEY = '40489ab6ba001d13b45d8b38709f687c'
+
+conn = pymysql.connect(host="172.116.176.142:3306", port=3306, user='root', passwd='projectnyx1234')
+conn.cursor().execute("CREATE DATABASE IF NOT EXISTS tmdb")
+conn = pymysql.connect(host="172.116.176.142:3306",
+                       port=3306,
+                       user='root',
+                       passwd='projectnyx1234',
+                       db='tmdb')
+
 
 def generate_location_financials(volume)->pd.DataFrame:
     '''
@@ -53,4 +64,8 @@ tbl_location_financials = """SELECT production_country, sum(gross_margin) as loc
                           order by location_gross_margin_pct desc, location_gross_margin desc
                        """
 final_table_locations = ps.sqldf(tbl_location_financials, locals())
-final_table_locations
+final_table_locations.to_sql(name='locations',
+                        con=conn,
+                        if_exists='replace',
+                        index=False,
+                        flavor='mysql')

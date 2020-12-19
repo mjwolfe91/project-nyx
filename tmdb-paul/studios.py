@@ -3,7 +3,17 @@ import numpy as np
 import pandas as pd
 import pandasql as ps
 import tmdbsimple as tmdb
+import pymysql
+
 tmdb.API_KEY = '40489ab6ba001d13b45d8b38709f687c'
+
+conn = pymysql.connect(host="172.116.176.142:3306", port=3306, user='root', passwd='projectnyx1234')
+conn.cursor().execute("CREATE DATABASE IF NOT EXISTS tmdb")
+conn = pymysql.connect(host="172.116.176.142:3306",
+                       port=3306,
+                       user='root',
+                       passwd='projectnyx1234',
+                       db='tmdb')
 
 def generate_studio_financials(volume):
     '''
@@ -54,4 +64,8 @@ tbl_studio_financials = """SELECT production_studio, sum(gross_margin) as studio
                        """
 
 final_table_studios = ps.sqldf(tbl_studio_financials, locals())
-final_table_studios
+final_table_studios.to_sql(name='studios',
+                        con=conn,
+                        if_exists='replace',
+                        index=False,
+                        flavor='mysql')

@@ -3,8 +3,17 @@ import numpy as np
 import pandas as pd
 import pandasql as ps
 import tmdbsimple as tmdb
+import pymysql
 
 tmdb.API_KEY = '40489ab6ba001d13b45d8b38709f687c'
+
+conn = pymysql.connect(host="172.116.176.142:3306", port=3306, user='root', passwd='projectnyx1234')
+conn.cursor().execute("CREATE DATABASE IF NOT EXISTS tmdb")
+conn = pymysql.connect(host="172.116.176.142:3306",
+                       port=3306,
+                       user='root',
+                       passwd='projectnyx1234',
+                       db='tmdb')
 
 def generate_ratings_financials(volume)->pd.DataFrame:
     '''
@@ -53,4 +62,8 @@ tbl_rating_financials = """SELECT average_rating, sum(gross_margin) as ratings_g
                            order by ratings_gross_margin_pct desc, ratings_gross_margin desc
                         """
 final_table_ratings = ps.sqldf(tbl_rating_financials, locals())
-final_table_ratings
+final_table_ratings.to_sql(name='ratings',
+                        con=conn,
+                        if_exists='replace',
+                        index=False,
+                        flavor='mysql')
