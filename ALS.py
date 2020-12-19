@@ -10,21 +10,30 @@ __version__ = "1.0.0"
 __email__ = "jdstroud@troy.edu"
 '''
 
-import pandas as pd
 from pyspark.sql.functions import col, explode
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
+from pyspark.sql import SQLContext
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
+import pickle
 
 sc = SparkContext
+sqlContext = SQLContext(sc)
 
 # sc.setCheckpointDir('checkpoint')
 spark = SparkSession.builder.appName('Recommendations').getOrCreate()
 
-movies = spark.read.csv("/FileStore/tables/movies.csv",header=True)
-ratings = spark.read.csv("/FileStore/tables/ratings.csv",header=True)
+movies = sqlContext.read.format('jdbc').options(url='jdbc:mysql://172.116.176.142:3306',
+                                            user='root',
+                                            password='projectnyx1234',
+                                            dbtable='movielens.movies_raw').load()
+
+ratings = sqlContext.read.format('jdbc').options(url='jdbc:mysql://172.116.176.142:3306',
+                                            user='root',
+                                            password='projectnyx1234',
+                                            dbtable='movielens.ratings_raw').load()
 
 ratings = ratings.\
     withColumn('userId', col('userId').cast('integer')).\
@@ -66,8 +75,7 @@ param_grid = ParamGridBuilder() \
             .build()
 
 # Define evaluator as RMSE and print length of evaluator
-evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating", predictionCol="prediction") 
-print ("Num models to be tested: ", len(param_grid))
+evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating", predictionCol="prediction")
 
 # Build cross validation using CrossValidator
 cv = CrossValidator(estimator=als, estimatorParamMaps=param_grid, evaluator=evaluator, numFolds=5)
@@ -83,14 +91,12 @@ best_model = model.bestModel
 test_predictions = best_model.transform(test)
 RMSE = evaluator.evaluate(test_predictions)
 
-test_predictions.show()
-
 # Generate n Recommendations for all users
 nrecommendations = best_model.recommendForAllUsers(10)
-nrecommendations.limit(10).show()
 
 nrecommendations = nrecommendations\
     .withColumn("rec_exp", explode("recommendations"))\
     .select('userId', col("rec_exp.movieId"), col("rec_exp.rating"))
 
-nrecommendations.limit(10).show()
+with open("./recommendations.pkl", "wb") as model_pkl:
+    pickle.dump(nrecommendations, model_pkl)
