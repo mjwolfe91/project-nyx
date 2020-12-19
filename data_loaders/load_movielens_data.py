@@ -26,7 +26,8 @@ def load_csv_data(zipFile, files):
                 driver='com.mysql.jdbc.Driver',
                 dbtable=f'{file}_raw'.replace("-","_"),
                 user='root',
-                password='projectnyx1234').mode('overwrite').save()
+                password='projectnyx1234',
+                batchsize=100000).mode('overwrite').save()
 
 if __name__ == '__main__':
     load_csv_data(SparkFiles.get("ml-25m.zip"), movie_lens_files)

@@ -21,7 +21,8 @@ def load_tsv_data(tsv_files):
             driver='com.mysql.jdbc.Driver',
             dbtable=f'{file}_raw'.replace(".", "_"),
             user='root',
-            password='projectnyx1234').mode('overwrite').save()
+            password='projectnyx1234',
+            batchsize=100000).mode('overwrite').save()
 
 if __name__ == '__main__':
     load_tsv_data(imdb_files)

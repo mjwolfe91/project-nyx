@@ -19,7 +19,8 @@ def load_tsv_data(tsv_file, output_name):
         driver='com.mysql.jdbc.Driver',
         dbtable=f'{output_name}_raw'.replace("-", "_"),
         user='root',
-        password='projectnyx1234').mode('overwrite').save()
+        password='projectnyx1234',
+        batchsize=100000).mode('overwrite').save()
 
 if __name__ == '__main__':
     load_tsv_data("amazon_reviews_us_Video_DVD_v1_00.tsv.gz", "amazon_video_reviews")
