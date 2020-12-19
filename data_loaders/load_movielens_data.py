@@ -21,13 +21,14 @@ def load_csv_data(zipFile, files):
         for file in files:
             extracted = zip.extract("ml-25m/{}.csv".format(file))
             df = sqlContext.read.csv(extracted, header=True)
-            df.write.format("jdbc").options(
-                url="jdbc:mysql://172.116.176.142:3306/data",
-                driver='com.mysql.jdbc.Driver',
-                dbtable=f'{file}_raw'.replace("-","_"),
+            df.repartition(10).write.format("jdbc").options(
+                url="jdbc:mysql://172.116.176.142:3306/data",zzzzzzzzzzzzz
+                driver='com.mysql.cj.jdbc.Driver',
+                dbtable=f'data.{file}_raw'.replace("-","_"),
                 user='root',
                 password='projectnyx1234',
-                batchsize=100000).mode('overwrite').save()
+                batchsize=100000,
+                useSSL=False).mode('overwrite').save()
 
 if __name__ == '__main__':
     load_csv_data(SparkFiles.get("ml-25m.zip"), movie_lens_files)

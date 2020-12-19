@@ -16,13 +16,14 @@ def load_tsv_data(tsv_files):
     for file in tsv_files:
         sc.addFile(f"https://datasets.imdbws.com/{file}.tsv.gz")
         out_df = sqlContext.read.csv(SparkFiles.get(f"{file}.tsv.gz"), sep=r'\t', header=True)
-        out_df.write.format("jdbc").options(
+        out_df.repartition(10).write.format("jdbc").options(
             url="jdbc:mysql://172.116.176.142:3306/data",
-            driver='com.mysql.jdbc.Driver',
-            dbtable=f'{file}_raw'.replace(".", "_"),
+            driver='com.mysql.cj.jdbc.Driver',
+            dbtable=f'data.{file}_raw'.replace(".", "_"),
             user='root',
             password='projectnyx1234',
-            batchsize=100000).mode('overwrite').save()
+            batchsize=100000,
+            useSSL=False).mode('overwrite').save()
 
 if __name__ == '__main__':
     load_tsv_data(imdb_files)
