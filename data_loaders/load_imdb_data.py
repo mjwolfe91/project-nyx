@@ -19,7 +19,7 @@ def load_tsv_data(tsv_files):
         out_df.repartition(10).write.format("jdbc").options(
             url="jdbc:mysql://172.116.176.142:3306/data",
             driver='com.mysql.cj.jdbc.Driver',
-            dbtable=f'data.{file}_raw'.replace(".", "_"),
+            dbtable=f'data.imdb_{file}_raw'.replace(".", "_"),
             user='root',
             password='projectnyx1234',
             batchsize=100000,

@@ -1,0 +1,47 @@
+{
+  "name": "www",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^12.6.0",
+    "gulp": "^4.0.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.1",
+    "semantic-ui-react": "^2.0.1",
+    "web-vitals": "^0.2.4"
+  },
+  "scripts": {
+    "start": "PORT=80 craco start",
+    "build": "craco  build",
+    "test": "craco  test",
+    "eject": "craco  eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@craco/craco": "^6.0.0",
+    "@semantic-ui-react/craco-less": "^1.2.1",
+    "graceful-fs": "^4.2.4",
+    "semantic-ui-less": "^2.4.1"
+  }
+}

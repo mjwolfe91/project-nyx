@@ -1,0 +1,9 @@
+from godatadriven/pyspark:latest
+
+RUN pip install pyspark fastapi uvicorn findspark pandas mysql-connector-python
+
+COPY ./ /app
+
+EXPOSE 8000
+
+ENTRYPOINT cd /app && python api.py
