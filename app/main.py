@@ -1,64 +1,37 @@
-from flask import Flask, render_template, send_from_directory, request, redirect, flash
-import secrets
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import pickle
-import pandas as pd
-import sqlalchemy as sa
-from time import sleep
 
-app = Flask(__name__)
-app.secret_key = secrets.token_urlsafe(32)
+app = FastAPI(title="Customer Recommendations", version="1.0.0", root_path="/api")
 
-# Note the server address here. Just mysql! It's the service name in our compose file.
-con = sa.create_engine("mysql://root@projectnyx1234@172.116.176.142:3306", echo=True)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-sleep(15)
-con.connect()
-
-# Make the schema if it doesn't exist
-schemas = sa.inspect(con).get_schema_names()
-print(schemas)
-if 'user' not in schemas:
-    con.execute(sa.schema.CreateSchema('user'))
-
-
+# Let's load in the model we used before
 with open("./recommendations.pkl", "rb") as f:
     clf = pickle.load(f)
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    index = "index.html"
-    #todo get inputs from Stroud
-    pred = "Enter your TBD inputs below."
-    if request.method == "GET":
-        return render_template(index, pred=pred)
-    else:
-        print(list(request.form.keys()))
-        try:
-            # Get the things from the form, make them floats (they start as strings)
-            colnames = ["userId", "rec_exp.movieId", "rec_exp.rating"]
-            responses = [request.form.get(item) for item in colnames]
-            inputs = [[float(item) for item in responses]]
+class Recommendation(BaseModel):
+    """
+    todo: get this info from Stroud!!
+    """
 
-            # Write the submission to SQL!
-            pd.DataFrame(columns=colnames, data=inputs).to_sql('submissions', con, schema='user', if_exists='append', index=False)
-            #todo update once inputs are ready
-            pred = f"We think your flower is a {clf.predict(inputs)[0]}!"
-        except Exception as e:
-            print(e)
-            flash("Invalid inputs! Try again.", "warn")
-            redirect(index)
+@app.route("/predict")
+def predict(sample: Recommendation):
+    """
+    Unpack the responses, predict on the input variables, and return the prediction.
+    """
+    #responses = [
+        #todo get info from Stroud
+    #]
 
-    return render_template(index, pred=pred)
-
-
-@app.route("/js/<path:path>")
-def send_js(path):
-    return send_from_directory("static/js", path)
-
-
-@app.route("/css/<path:path>")
-def send_css(path):
-    return send_from_directory("static/css", path)
+    return clf.predict(inputs)[0]
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=80, debug=True)

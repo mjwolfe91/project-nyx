@@ -1,7 +1,3 @@
-pyspark
+fastapi
 pickle
-flask
-secrets
-pandas
-sqlalchemy
-time
+pydantic
