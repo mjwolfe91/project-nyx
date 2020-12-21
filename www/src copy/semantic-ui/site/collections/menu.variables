@@ -1,0 +1,23 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+@background: #8a92a6;
+@color: #8a92a6;
+@activeItemTextColor: #fff;
+@textColor: #000;
+@activeItemBackground: #006692;
+@activeHoverItemBackground: #888;
+@activeHoverItemColor: #fff;
+@hoverItemBackground: #888;
+@hoverItemColor: #000;
+
+@dropdownActiveItemBackground: #feaf77;
+@dropdownActiveItemColor: #ffffff;
+
+@dropdownSelectedItemBackground: @transparentBlack;
+@dropdownSelectedItemColor: @selectedTextColor;
+
+@dropdownItemBackground: #631e50;
+@dropdownItemColor: @textColor;
+
+@verticalMenuBackground: #8a92a6;
